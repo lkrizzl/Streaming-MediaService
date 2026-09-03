@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+  <Project Path="MediaService.Api/MediaService.Api.csproj" />
+  <Project Path="MediaService.Application/MediaService.Application.csproj" />
+  <Project Path="MediaService.Domain/MediaService.Domain.csproj" />
+  <Project Path="MediaService.Infrastructure/MediaService.Infrastructure.csproj" />
+  <Project Path="MediaService.Persistence/MediaService.Persistence.csproj" />
+  <Project Path="MediaService.Worker/MediaService.Worker.csproj" />
+</Solution>
