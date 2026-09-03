@@ -3,12 +3,6 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
-      - Minio__Endpoint=${MINIO_ENDPOINT}
-      - Minio__AccessKey=${MINIO_ROOT_USER}
-      - Minio__SecretKey=${MINIO_ROOT_PASSWORD}
-      - Minio__Bucket=${MINIO_BUCKET}
-      - Minio__PublicEndpoint=${MINIO_PUBLIC_ENDPOINT}
-      - ConnectionStrings__MediaDb=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
     ports:
       - "8080"
     volumes:

@@ -10,14 +10,17 @@ public class UploadController : ControllerBase
 {
     private readonly IStorageService _storageService;
     private readonly IEpisodeMediaRepository _repository;
+    private readonly IMessagePublisher _publisher;
 
-    public UploadController(IStorageService storageService, IEpisodeMediaRepository repository)
+    public UploadController(IStorageService storageService, IEpisodeMediaRepository repository, IMessagePublisher publisher)
     {
         _storageService = storageService;
         _repository = repository;
+        _publisher = publisher;
     }
 
     [HttpPost]
+    [RequestSizeLimit(500_000_000)]
     public async Task<IActionResult> Upload(IFormFile file, [FromForm] Guid episodeId, CancellationToken cancellationToken)
     {
         if (file is null || file.Length == 0)
@@ -32,12 +35,13 @@ public class UploadController : ControllerBase
             EpisodeId = episodeId,
             ObjectKey = objectKey,
             OriginalFileName = file.FileName,
-            Status = MediaStatus.Ready
+            Status = MediaStatus.Pending
         };
 
         await _repository.AddAsync(episodeMedia, cancellationToken);
+        await _publisher.PublishTranscodeJobAsync(episodeMedia.Id, objectKey, cancellationToken);
 
-        return Ok(new { episodeMedia.Id, episodeMedia.ObjectKey });
+        return Ok(new { episodeMedia.Id, episodeMedia.ObjectKey, episodeMedia.Status });
     }
 
     [HttpGet("{objectKey}/url")]

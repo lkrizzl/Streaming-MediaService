@@ -1,6 +1,8 @@
 using MediaService.Infrastructure.Storage;
 using MediaService.Persistence;
 using Microsoft.EntityFrameworkCore;
+using MediaService.Infrastructure.Messaging;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddMinioStorage(builder.Configuration);
 builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddRabbitMqMessaging(builder.Configuration);
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

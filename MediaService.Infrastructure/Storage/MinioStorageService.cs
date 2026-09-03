@@ -79,6 +79,32 @@ public class MinioStorageService : IStorageService
             await _client.PutBucketAsync(_options.Bucket, cancellationToken);
         }
     }
+    public async Task DownloadToFileAsync(string objectKey, string destinationPath, CancellationToken cancellationToken = default)
+    {
+        var response = await _client.GetObjectAsync(_options.Bucket, objectKey, cancellationToken);
+        await using var fileStream = File.Create(destinationPath);
+        await response.ResponseStream.CopyToAsync(fileStream, cancellationToken);
+    }
 
+    public async Task UploadDirectoryAsync(string directoryPath, string keyPrefix, CancellationToken cancellationToken = default)
+    {
+        foreach (var filePath in Directory.GetFiles(directoryPath))
+        {
+            var fileName = Path.GetFileName(filePath);
+            var key = $"{keyPrefix}/{fileName}";
+            var contentType = fileName.EndsWith(".m3u8") ? "application/vnd.apple.mpegurl" : "video/mp2t";
+
+            await using var stream = File.OpenRead(filePath);
+            var request = new PutObjectRequest
+            {
+                BucketName = _options.Bucket,
+                Key = key,
+                InputStream = stream,
+                ContentType = contentType
+            };
+
+            await _client.PutObjectAsync(request, cancellationToken);
+        }
+    }
 
 }

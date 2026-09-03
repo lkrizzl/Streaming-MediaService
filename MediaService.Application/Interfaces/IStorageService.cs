@@ -6,4 +6,6 @@ public interface IStorageService
     Task<string> GetPresignedUrlAsync(string objectKey, TimeSpan expiry, CancellationToken cancellationToken = default);
     Task DeleteAsync(string objectKey, CancellationToken cancellationToken = default);
     Task<bool> ExistsAsync(string objectKey, CancellationToken cancellationToken = default);
+    Task DownloadToFileAsync(string objectKey, string destinationPath, CancellationToken cancellationToken = default);
+    Task UploadDirectoryAsync(string directoryPath, string keyPrefix, CancellationToken cancellationToken = default);
 }
