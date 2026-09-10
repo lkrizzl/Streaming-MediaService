@@ -10,8 +10,8 @@ public class FfmpegTranscodingService : ITranscodingService
         Directory.CreateDirectory(outputDirectory);
         var playlistPath = Path.Combine(outputDirectory, "playlist.m3u8");
 
-        var arguments = $"-i \"{inputFilePath}\" -codec:v libx264 -codec:a aac -hls_time 10 -hls_playlist_type vod -hls_segment_filename \"{outputDirectory}/segment_%03d.ts\" \"{playlistPath}\"";
-
+        var arguments = $"-y -i \"{inputFilePath}\" -codec:v libx264 -preset ultrafast -codec:a aac -hls_time 10 -hls_playlist_type vod -hls_segment_filename \"{outputDirectory}/segment_%03d.ts\" \"{playlistPath}\"";
+        
         var psi = new ProcessStartInfo
         {
             FileName = "ffmpeg",

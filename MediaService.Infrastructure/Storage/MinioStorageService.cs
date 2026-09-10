@@ -107,4 +107,9 @@ public class MinioStorageService : IStorageService
         }
     }
 
+    public string GetPublicUrl(string objectKey)
+    {
+        return $"http://{_options.PublicEndpoint}/{_options.Bucket}/{objectKey}";
+    }
+
 }

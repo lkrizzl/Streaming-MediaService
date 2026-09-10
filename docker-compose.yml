@@ -79,6 +79,9 @@ services:
       RabbitMq__HostName: rabbitmq
       RabbitMq__UserName: ${RABBITMQ_USER}
       RabbitMq__Password: ${RABBITMQ_PASSWORD}
+      WebApi__BaseUrl: ${WEBAPI_BASE_URL}
+      WebApi__InternalApiKey: ${WEBAPI_INTERNAL_API_KEY}
+      MediaServicePublicUrl: ${MEDIA_SERVICE_PUBLIC_URL}
     depends_on:
       minio:
         condition: service_started
@@ -86,7 +89,15 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    networks:
+      - default
+      - shared_network
 
 volumes:
   minio-data:
   postgres-data:
+
+networks:
+  shared_network:
+    name: streaming_shared
+    external: true

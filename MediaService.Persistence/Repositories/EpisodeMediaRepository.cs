@@ -17,7 +17,10 @@ public class EpisodeMediaRepository : IEpisodeMediaRepository
         => _context.EpisodeMedias.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
     public Task<EpisodeMedia?> GetByEpisodeIdAsync(Guid episodeId, CancellationToken cancellationToken = default)
-        => _context.EpisodeMedias.FirstOrDefaultAsync(e => e.EpisodeId == episodeId, cancellationToken);
+        => _context.EpisodeMedias
+            .Where(e => e.EpisodeId == episodeId)
+            .OrderByDescending(e => e.CreatedAt)
+            .FirstOrDefaultAsync(cancellationToken);
 
     public async Task AddAsync(EpisodeMedia entity, CancellationToken cancellationToken = default)
     {

@@ -4,6 +4,7 @@ public interface IStorageService
 {
     Task<string> UploadAsync(Stream fileStream, string fileName, string contentType, CancellationToken cancellationToken = default);
     Task<string> GetPresignedUrlAsync(string objectKey, TimeSpan expiry, CancellationToken cancellationToken = default);
+    string GetPublicUrl(string objectKey);
     Task DeleteAsync(string objectKey, CancellationToken cancellationToken = default);
     Task<bool> ExistsAsync(string objectKey, CancellationToken cancellationToken = default);
     Task DownloadToFileAsync(string objectKey, string destinationPath, CancellationToken cancellationToken = default);

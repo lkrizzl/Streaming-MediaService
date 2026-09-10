@@ -29,16 +29,33 @@ public class UploadController : ControllerBase
         await using var stream = file.OpenReadStream();
         var objectKey = await _storageService.UploadAsync(stream, file.FileName, file.ContentType, cancellationToken);
 
-        var episodeMedia = new EpisodeMedia
-        {
-            Id = Guid.NewGuid(),
-            EpisodeId = episodeId,
-            ObjectKey = objectKey,
-            OriginalFileName = file.FileName,
-            Status = MediaStatus.Pending
-        };
+        var existing = await _repository.GetByEpisodeIdAsync(episodeId, cancellationToken);
 
-        await _repository.AddAsync(episodeMedia, cancellationToken);
+        EpisodeMedia episodeMedia;
+        if (existing is not null)
+        {
+            existing.ObjectKey = objectKey;
+            existing.OriginalFileName = file.FileName;
+            existing.Status = MediaStatus.Pending;
+            existing.StreamUrl = null;
+
+            await _repository.UpdateAsync(existing, cancellationToken);
+            episodeMedia = existing;
+        }
+        else
+        {
+            episodeMedia = new EpisodeMedia
+            {
+                Id = Guid.NewGuid(),
+                EpisodeId = episodeId,
+                ObjectKey = objectKey,
+                OriginalFileName = file.FileName,
+                Status = MediaStatus.Pending
+            };
+
+            await _repository.AddAsync(episodeMedia, cancellationToken);
+        }
+
         await _publisher.PublishTranscodeJobAsync(episodeMedia.Id, objectKey, cancellationToken);
 
         return Ok(new { episodeMedia.Id, episodeMedia.ObjectKey, episodeMedia.Status });
@@ -58,5 +75,18 @@ public class UploadController : ControllerBase
         if (media is null) return NotFound();
 
         return Ok(media);
+    }
+
+    [HttpGet("episode/{episodeId}/stream")]
+    public async Task<IActionResult> GetStreamUrl(Guid episodeId, CancellationToken cancellationToken)
+    {
+        var media = await _repository.GetByEpisodeIdAsync(episodeId, cancellationToken);
+        if (media is null) return NotFound();
+
+        if (media.Status != MediaStatus.Ready || media.StreamUrl is null)
+            return Conflict(new { status = media.Status.ToString(), message = "Media is not ready yet." });
+
+        var url = _storageService.GetPublicUrl(media.StreamUrl);
+        return Ok(new { url });
     }
 }
