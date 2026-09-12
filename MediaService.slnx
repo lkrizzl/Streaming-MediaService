@@ -8,4 +8,5 @@
   <Project Path="MediaService.Infrastructure/MediaService.Infrastructure.csproj" />
   <Project Path="MediaService.Persistence/MediaService.Persistence.csproj" />
   <Project Path="MediaService.Worker/MediaService.Worker.csproj" />
+  <Project Path="Tests/MediaService.Tests/MediaService.Tests.csproj" Id="9d80b064-c193-4b70-90f9-a22143926e9b" />
 </Solution>
