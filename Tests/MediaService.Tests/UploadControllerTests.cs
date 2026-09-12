@@ -2,7 +2,9 @@
 using MediaService.Application.Interfaces;
 using MediaService.Domain.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Microsoft.Extensions.Configuration;
 using Xunit;
 
 namespace MediaService.Tests;
@@ -32,7 +34,16 @@ public class UploadControllerTests
 
         var publisher = new Mock<IMessagePublisher>();
 
-        var controller = new UploadController(storage.Object, repository.Object, publisher.Object);
+        var configuration = new Mock<IConfiguration>();
+        configuration.Setup(c => c["InternalApiKey"]).Returns("test-key");
+
+        var controller = new UploadController(storage.Object, repository.Object, publisher.Object, configuration.Object);
+
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        controller.ControllerContext.HttpContext.Request.Headers["X-Internal-Api-Key"] = "test-key";
 
         var fileMock = new Mock<IFormFile>();
         fileMock.Setup(f => f.Length).Returns(10);
@@ -60,7 +71,16 @@ public class UploadControllerTests
 
         var publisher = new Mock<IMessagePublisher>();
 
-        var controller = new UploadController(storage.Object, repository.Object, publisher.Object);
+        var configuration = new Mock<IConfiguration>();
+        configuration.Setup(c => c["InternalApiKey"]).Returns("test-key");
+
+        var controller = new UploadController(storage.Object, repository.Object, publisher.Object, configuration.Object);
+
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        controller.ControllerContext.HttpContext.Request.Headers["X-Internal-Api-Key"] = "test-key";
 
         var fileMock = new Mock<IFormFile>();
         fileMock.Setup(f => f.Length).Returns(10);

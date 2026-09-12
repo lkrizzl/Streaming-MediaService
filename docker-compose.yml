@@ -57,6 +57,7 @@ services:
       RabbitMq__HostName: rabbitmq
       RabbitMq__UserName: ${RABBITMQ_USER}
       RabbitMq__Password: ${RABBITMQ_PASSWORD}
+      InternalApiKey: ${WEBAPI_INTERNAL_API_KEY}
     depends_on:
       minio:
         condition: service_started
@@ -64,6 +65,9 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    networks:
+      - default
+      - shared_network
 
   mediaservice.worker:
     build:

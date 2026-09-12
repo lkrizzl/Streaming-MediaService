@@ -11,21 +11,25 @@ public class UploadController : ControllerBase
     private readonly IStorageService _storageService;
     private readonly IEpisodeMediaRepository _repository;
     private readonly IMessagePublisher _publisher;
+    private readonly string _internalApiKey;
 
-    public UploadController(IStorageService storageService, IEpisodeMediaRepository repository, IMessagePublisher publisher)
+    public UploadController(IStorageService storageService, IEpisodeMediaRepository repository, IMessagePublisher publisher, IConfiguration configuration)
     {
         _storageService = storageService;
         _repository = repository;
         _publisher = publisher;
+        _internalApiKey = configuration["InternalApiKey"]!;
     }
 
     [HttpPost]
     [RequestSizeLimit(500_000_000)]
     public async Task<IActionResult> Upload(IFormFile file, [FromForm] Guid episodeId, CancellationToken cancellationToken)
     {
-        if (file is null || file.Length == 0)
-            return BadRequest("File is empty.");
-
+        if (!Request.Headers.TryGetValue("X-Internal-Api-Key", out var providedKey) ||
+            providedKey != _internalApiKey)
+        {
+            return Unauthorized();
+        }
         await using var stream = file.OpenReadStream();
         var objectKey = await _storageService.UploadAsync(stream, file.FileName, file.ContentType, cancellationToken);
 
